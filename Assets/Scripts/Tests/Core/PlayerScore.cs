@@ -12,6 +12,13 @@ public class PlayerScore : MonoBehaviour
     private float scoreBonus = 1f;
     float score = 0f;
 
+    public float Score => score;
+    public float MaxPlayerY => maxPlayerY;
+    public float LastPosition => lastPosition;
+    public float ScoreMultiplyer => scoreMultiplyer;
+    public float ScoreBonus => scoreBonus;
+
+
     void Start()
     {
         lastPosition = playerPos.position.y;
@@ -48,6 +55,7 @@ public class PlayerScore : MonoBehaviour
     public void AddScore(float amount)
     {
         score += amount * scoreBonus;
-        scoreText.text = "Score: " + Mathf.FloorToInt(score).ToString();
+        if (scoreText != null)
+            scoreText.text = "Score: " + Mathf.FloorToInt(score).ToString();
     }
 }

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -10,6 +11,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private TextMeshProUGUI doubleJumpText;
 
     //Colisão do chão
     private Vector2 groundCheckSize = new Vector2(0.75f, 0.1f);
@@ -23,10 +25,14 @@ public class PlayerScript : MonoBehaviour
     private float jumpBufferTime = 0.1f;
     private float jumpBufferCounter;
 
+    PlayerDoubleJump playerDoubleJump;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        playerDoubleJump = new PlayerDoubleJump(0); // Initialize with 0 extra jumps
+        doubleJumpText.text = "Pulo Duplo: " + playerDoubleJump.ExtraJumps + "/" + playerDoubleJump.maxExtraJumps; // Update the UI
+
     }
 
     // Update is called once per frame
@@ -61,11 +67,20 @@ public class PlayerScript : MonoBehaviour
             jumpBufferCounter = 0f; // Reset jump buffer counter after jumping
         }
 
+        if (Input.GetButtonDown("Jump") && coyoteTimeCounter <= 0f && jumpBufferCounter > 0f && playerDoubleJump.ExtraJumps > 0)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            coyoteTimeCounter = 0f; // Reset coyote time counter when jump is released
+            playerDoubleJump.RemoveExtraJump(1); // Use one extra jump
+            doubleJumpText.text = "Pulo Duplo: " + playerDoubleJump.ExtraJumps + "/" + playerDoubleJump.maxExtraJumps; // Update the UI
+        }
+
         if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0f)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
             coyoteTimeCounter = 0f; // Reset coyote time counter when jump is released
         }
+
     }
     
     private void FixedUpdate()
@@ -83,5 +98,11 @@ public class PlayerScript : MonoBehaviour
         speed = newSpeed;
         jumpForce = newJumpForce;
         coyoteTime = newCoyoteTime;
+    }
+
+    public void AddDoubleJump()
+    {
+        playerDoubleJump.AddExtraJump(1); // Add one extra jump
+        doubleJumpText.text = "Pulo Duplo: " + playerDoubleJump.ExtraJumps + "/" + playerDoubleJump.maxExtraJumps; // Update the UI
     }
 }
